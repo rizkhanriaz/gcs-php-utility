@@ -101,18 +101,40 @@ class FileOperations
     /**
      * Download an object from Cloud Storage and save it as a local file.
      *
-     * @param string $bucketName the name of your Google Cloud bucket.
-     * @param string $objectName the name of your Google Cloud object.
      * @param string $destination the local destination to save the encrypted object.
      *
      * @return void
      */
-    public function download_object($objectName, $destination)
+    public function download_objects($destination)
     {
         $bucket = $this->Gbucket;
-        $object = $bucket->object($objectName);
-        $object->downloadToFile($destination);
-        printf('Downloaded gs://%s/%s to %s' . PHP_EOL,
-            $objectName, basename($destination));
+        foreach ($bucket->objects() as $object) {
+
+            $objName = $object->name();
+            $objInfo = $object->info();
+
+            //check the content type to detect file or directory
+            if($objInfo['contentType'] === 'application/x-www-form-urlencoded;charset=utf-8'){
+
+                $dirPath = $destination.'/'.$objName;
+
+                //if folder doesn't exist create folder
+                if (!file_exists($dirPath)) {
+
+                    mkdir($dirPath, 0777, true);
+                    echo 'Folder Created'. $objName . "\r\n";
+                }
+
+            }else{
+
+                echo 'Downloading '. $objName . "\r\n";
+                $destinationObj = $destination.'/'.$objName;
+                $object->downloadToFile($destinationObj);
+            }
+
+        }
+
+        echo 'Task download objects success'. "\r\n";
+
     }
 }

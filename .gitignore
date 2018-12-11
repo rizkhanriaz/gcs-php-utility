@@ -1,2 +1,4 @@
 vendor/
-key/
+
+keys/
+gcs-bucket-config.php

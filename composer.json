@@ -1,0 +1,17 @@
+{
+    "name": "rizkhan/gce-php-utility",
+    "description": "A PHP utility for Google bucket API functions",
+    "authors": [
+        {
+            "name": "Rizkhan",
+            "email": "rizkhan@3cs.solutions"
+        }
+    ],
+    "require": {
+        "php": ">=5.6",
+        "google/cloud-storage": "^1.5"
+    },
+    "autoload": {
+        "psr-4": {"Gbucket\\": "src"}
+   }
+}

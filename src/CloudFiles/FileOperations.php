@@ -53,13 +53,13 @@ class FileOperations
 
         //make objects public on upload
         if ($publicAccess) {
-            
+
             $options['predefinedAcl'] = 'PUBLICREAD';
         }
 
         //upload files
         $filespaths = glob($uploadFolderPath."/*.".$uploadFileTypes, GLOB_BRACE);
-        
+
         foreach ($filespaths as $filePath) {
 
             $filePathExplode = explode('/', $filePath);
@@ -147,7 +147,24 @@ class FileOperations
             $objName = $object->name();
             $objInfo = $object->info();
 
-            //check the content type to detect file or directory
+
+            // Create folders uploaded to GCS using php utility before downloading
+            $filterDir = explode('/', $objName);
+
+            if (!empty($filterDir[0]) && !empty($filterDir[1])){
+
+                $dirPath = $destination.'/'.$filterDir[0];
+
+                //if folder doesn't exist create folder
+                if (!file_exists($dirPath)) {
+
+                    mkdir($dirPath, 0777, true);
+                    echo 'Folder Created '. $filterDir[0] . "\r\n";
+                }
+            }
+
+
+            // Create folders created on GCS Interface befrore downloading
             if($objInfo['contentType'] === 'application/x-www-form-urlencoded;charset=utf-8'){
 
                 $dirPath = $destination.'/'.$objName;
@@ -156,7 +173,7 @@ class FileOperations
                 if (!file_exists($dirPath)) {
 
                     mkdir($dirPath, 0777, true);
-                    echo 'Folder Created'. $objName . "\r\n";
+                    echo 'Folder Created '. $objName . "\r\n";
                 }
 
             }else{

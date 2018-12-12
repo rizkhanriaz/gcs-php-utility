@@ -9,18 +9,18 @@ $authFile = __DIR__ . '/keys/gcs-bucket-service-key.json';
 $bucketName = 'your-bucket-name';
 
 //upload
-$uploadFileName = 'filename.png';
-$uploadFilePath =  __DIR__ . '/filename.png';
+$uploadFileTypes =  '{jpg,gif,png,PNG,jpeg}';
 
-//download
-$destination = __DIR__ . '/downloads';
+//assets
+$assestsPath = __DIR__ . '/assets';
 
 $gBucket = new FileOperations($bucketName, $authFile);
 
-
-//$gBucket->uploadFile($uploadFileName, FileSystem::getContents($uploadFilePath));
+//Upload All assets from local directory to Bucket
+$gBucket->uploadFile($assestsPath, $uploadFileTypes);
 
 //$gBucket->list_objects($bucketName);
 
 //Download All assets from Bucket to local directory
-$gBucket->download_objects($destination);
+//$gBucket->download_objects($assestsPath);
+

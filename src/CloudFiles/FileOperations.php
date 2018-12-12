@@ -41,30 +41,64 @@ class FileOperations
     /**
      * Upload an asset
      *
-     * @param string $filename
-     * @param string $contents
+     * @param string $uploadFolderPath
+     * @param string $uploadFileTypes
      * @param boolean $publicAccess
-     * @return Google\Cloud\Storage\StorageObject
      */
-    public function uploadFile($filename, $contents, $publicAccess = true)
+    public function uploadFile($uploadFolderPath, $uploadFileTypes, $publicAccess = true)
     {
 
-        $options = [];
-        if ($publicAccess == true) {
-            $options['predefinedAcl'] = 'publicRead';
+        $bucket = $this->Gbucket;
+        $options = array();
+
+        //make objects public on upload
+        if ($publicAccess) {
+            
+            $options['predefinedAcl'] = 'PUBLICREAD';
         }
 
-        if ($contents == false) {
-            throw new \Exception('Empty file contents');
-            return false;
-        }
-        if ($filename == false) {
-            throw new \Exception("Empty filename");
-            return false;
+        //upload files
+        $filespaths = glob($uploadFolderPath."/*.".$uploadFileTypes, GLOB_BRACE);
+        
+        foreach ($filespaths as $filePath) {
+
+            $filePathExplode = explode('/', $filePath);
+
+            $fileName = end($filePathExplode);
+            $options['name'] = $fileName;
+
+            $file = fopen($filePath, 'r');
+
+            echo 'Uploading '. $fileName . "\r\n";
+            $bucket->upload($file, $options);
         }
 
-        $options['name'] = $filename;
-        return $this->Gbucket->upload($contents, $options);
+        //upload files in sub directories
+        $dirs = array_filter(glob($uploadFolderPath.'/*'), 'is_dir');
+
+        foreach ($dirs as $dir) {
+
+            $folderNameExplode = explode('/', $dir);
+
+            $folderName = end($folderNameExplode);
+
+            $subFolderContents = glob($uploadFolderPath."/".$folderName."/*.".$uploadFileTypes, GLOB_BRACE);
+
+            foreach ($subFolderContents as $subFolderContent) {
+
+                $subFilePathExplode = explode('/', $subFolderContent);
+                $subFileName = end($subFilePathExplode);
+
+                $options['name'] = $folderName.'/'.$subFileName;
+
+                $file = fopen($subFolderContent, 'r');
+
+                echo 'Uploading '. $folderName.'/'.$subFileName . "\r\n";
+                $bucket->upload($file, $options);
+
+            }
+
+        }
     }
 
     /**

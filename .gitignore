@@ -1,4 +1,4 @@
 vendor/
-downloads/
+assets/
 keys/
 gcs-bucket-config.php

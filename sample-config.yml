@@ -1,0 +1,6 @@
+---
+bucket:
+  name: your-bucket-name
+  key: "keys/key-filename.json"
+  syncfolder: "path/to/upload/and/download/dir/"
+  uploadfiletypes: "jpg,gif,png,PNG,jpeg"

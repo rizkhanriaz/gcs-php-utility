@@ -5,11 +5,28 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Symfony\Component\Console\Application;
 use Pimple\Container;
 use Gbucket\Lib\Config;
-use Gbucket\Commands\HelloworldCommand;
-
-
-$container = new Container();
+use Gbucket\Lib\Data;
+use Gbucket\Commands\DownloadCommand;
 
 $app = new Application();
-$app->add(new HelloworldCommand());
+$container = new Container();
+
+
+$configPath = getcwd() . '/config.yml';
+$container['config'] = new Config($container, $configPath);
+
+$container['data'] = function ($container) {
+    
+    $config = $container['config'];
+    $data = new Data();
+    $data->setBucketName($config->get('bucket.name'));
+    $data->setJsonKeyPath($config->get('bucket.key'));
+    $data->setSyncFolder($config->get('bucket.syncfolder'));
+    $data->setUploadFiletypes($config->get('bucket.uploadfiletypes'));
+    
+    return $data;
+};
+
+
+$app->add(new DownloadCommand($container));
 $app->run();

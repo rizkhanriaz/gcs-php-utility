@@ -1,4 +1,4 @@
 vendor/
 assets/
 keys/
-gcs-bucket-config.php
+config.yml

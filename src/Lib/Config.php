@@ -24,7 +24,7 @@ class Config
      * @param Container $container
      * @param string $fileName
      */
-    public function __construct($fileName = 'config.yml')
+    public function __construct(Container $container, $fileName = 'config.yml')
     {
 
         $this->parseConfig($fileName);
@@ -39,13 +39,38 @@ class Config
      */
     private function parseConfig($file)
     {
-        try {
-		    $value = Yaml::parseFile($file);
+        if (!file_exists($file)) {
+            throw new \Exception('The config file does not exist!');
+        }
 
-		}catch (ParseException $exception) {
+        $this->parsedConfig = Yaml::parse(file_get_contents($file));
+    }
 
-		    printf('Unable to parse the YAML string: %s', $exception->getMessage());
-		}
+    /**
+     * Get config item
+     *
+     * @param string $param
+     * @return mixed
+     */
+    public function get($param = null)
+    {
+        if ($param != null) {
+
+            $data = $this->parsedConfig;
+            $items = explode('.', $param);
+
+            foreach ($items as $item) {
+
+                if (!array_key_exists($item, $data)) {
+                    return false;
+                }
+
+                $data = $data[$item];
+            }
+
+            return $data;
+        }
+        return $this->parsedConfig;
     }
 
 

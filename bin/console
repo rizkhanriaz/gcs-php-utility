@@ -7,6 +7,8 @@ use Pimple\Container;
 use Gbucket\Lib\Config;
 use Gbucket\Lib\Data;
 use Gbucket\Commands\DownloadCommand;
+use Gbucket\Commands\UploadCommand;
+
 
 $app = new Application();
 $container = new Container();
@@ -29,4 +31,5 @@ $container['data'] = function ($container) {
 
 
 $app->add(new DownloadCommand($container));
+$app->add(new UploadCommand($container));
 $app->run();

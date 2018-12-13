@@ -38,6 +38,34 @@ class FileOperations
         return $bucket;
     }
 
+    //get sub directories and files
+    private function rglob ($pattern, $flags = 0, $traversePostOrder = false) {
+        // Keep away the hassles of the rest if we don't use the wildcard anyway
+        if (strpos($pattern, '/**/') === false) {
+            return glob($pattern, $flags);
+        }
+
+        $patternParts = explode('/**/', $pattern);
+
+        // Get sub dirs
+        $dirs = glob(array_shift($patternParts) . '/*', GLOB_ONLYDIR | GLOB_NOSORT);
+
+        // Get files for current dir
+        $files = glob($pattern, $flags);
+
+        foreach ($dirs as $dir) {
+            $subDirContent = $this->rglob($dir . '/**/' . implode('/**/', $patternParts), $flags, $traversePostOrder);
+
+            if (!$traversePostOrder) {
+                $files = array_merge($files, $subDirContent);
+            } else {
+                $files = array_merge($subDirContent, $files);
+            }
+        }
+
+        return $files;
+    }
+
     /**
      * Upload an asset
      *
@@ -55,7 +83,7 @@ class FileOperations
         if ($publicAccess) {
 
             $options['predefinedAcl'] = 'PUBLICREAD';
-        }
+        };
 
         //upload files
         $filespaths = glob($uploadFolderPath."/*.".$uploadFileTypes, GLOB_BRACE);
@@ -74,7 +102,7 @@ class FileOperations
         }
 
         //upload files in sub directories
-        $dirs = array_filter(glob($uploadFolderPath.'/*'), 'is_dir');
+        $dirs = $this->rglob($uploadFolderPath.'**/**');
 
         foreach ($dirs as $dir) {
 
@@ -82,18 +110,19 @@ class FileOperations
 
             $folderName = end($folderNameExplode);
 
-            $subFolderContents = glob($uploadFolderPath."/".$folderName."/*.".$uploadFileTypes, GLOB_BRACE);
+            $file_parts = pathinfo($folderName);
 
-            foreach ($subFolderContents as $subFolderContent) {
+            $dirTrimed = str_replace($uploadFolderPath, "", $dir);
 
-                $subFilePathExplode = explode('/', $subFolderContent);
-                $subFileName = end($subFilePathExplode);
+            if(isset($file_parts['extension'])){
 
-                $options['name'] = $folderName.'/'.$subFileName;
+                $dirTrimedExplode = explode('/', $dirTrimed);
+                $subFileName = end($dirTrimedExplode);
 
-                $file = fopen($subFolderContent, 'r');
+                $options['name'] = $dirTrimed;
 
-                echo 'Uploading '. $folderName.'/'.$subFileName . "\r\n";
+                $file = fopen($dir, 'r');
+                echo 'Uploading '. $dirTrimed . "\r\n";
                 $bucket->upload($file, $options);
 
             }

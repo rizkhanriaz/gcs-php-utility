@@ -6,7 +6,7 @@ Command line PHP utility for Google bucket API functions. Which can be used to u
 
 This package is available on packagist. You can use the following command to add this package into your composer dependancies.
 
-``` composer require rizkhan/gce-php-utility ```
+``` composer require rizkhan/gce-php-utility --dev ```
 
 ### Configuration
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env php
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
  
 use Symfony\Component\Console\Application;
 use Pimple\Container;
@@ -8,6 +7,28 @@ use Gbucket\Lib\Config;
 use Gbucket\Lib\Data;
 use Gbucket\Commands\DownloadCommand;
 use Gbucket\Commands\UploadCommand;
+
+// Detect source location
+$autoload = [
+    __DIR__ . '/../../../autoload.php',
+    __DIR__ . '/../vendor/autoload.php'
+];
+
+$loaded = false;
+for ($i = 0; $i < count($autoload); $i++) {
+    if (file_exists($autoload[$i])) {
+        require $autoload[$i];
+        $loaded = true;
+        break;
+    }
+}
+if (!$loaded) {
+    die(
+        'You need to set up the project dependencies using the following commands:' . PHP_EOL .
+        'wget http://getcomposer.org/composer.phar' . PHP_EOL .
+        'php composer.phar install' . PHP_EOL
+    );
+}
 
 
 $app = new Application();

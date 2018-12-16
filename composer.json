@@ -1,7 +1,7 @@
 {
     "name": "rizkhan/gce-php-utility",
     "description": "A PHP utility for Google bucket API functions",
-    "license": "GPL",
+    "license": "MIT",
     "authors": [
         {
             "name": "Rizkhan",
